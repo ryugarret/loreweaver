@@ -127,7 +127,7 @@ export function SettingsModal() {
         onClose={() => setSettingsOpen(false)}
         title="Ajustes"
       >
-        <div className="max-h-[70vh] overflow-y-auto">
+        <div className="pb-2">
           <Section title="Tema">
             <div className="grid grid-cols-3 gap-2">
               {THEMES.map(({ id, label, icon: Icon }) => (

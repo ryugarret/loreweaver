@@ -578,6 +578,13 @@ lista de capítulos.
 - Anti-desbordes: `FocusDock` `w-[min(380px,calc(100vw-2.5rem))]`; cabeceras de grafo y
   timeline con `flex-wrap`/apilado en móvil; fila de fecha/trama/botones de cada evento con
   `flex-wrap` + `ml-auto`. Wiki y Proyectos ya eran responsive (grids que apilan).
+- **Scroll de modales (crítico en móvil):** el componente `Modal` ahora es `flex flex-col`
+  con cabecera `shrink-0` y un **cuerpo `flex-1 min-h-0 overflow-y-auto`** (alto `max-h-[90dvh]`),
+  así NINGÚN modal corta su contenido/botones en móvil (antes `overflow-hidden` recortaba).
+  Se quitaron los `max-h-[Xvh] overflow-y-auto` internos redundantes (Settings, nuevo evento,
+  editar evento). `WikiDetail` (panel) ya scrollea; `ChapterHistory` ahora apila las dos
+  columnas en móvil (`flex-col md:flex-row`). Verificado a 375px: Ajustes/editar proyecto/
+  nuevo evento/ficha llegan a sus botones del fondo.
 - ⚠️ Pendiente real: el guardado en disco (File System Access) NO existe en Safari iOS →
   en iPad usar "Guardar/Abrir copia".
 

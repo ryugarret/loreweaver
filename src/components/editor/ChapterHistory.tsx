@@ -143,9 +143,9 @@ export function ChapterHistory({
           )}
         </div>
 
-        <div className="flex min-h-0 flex-1">
-          {/* Lista de versiones */}
-          <div className="w-56 shrink-0 overflow-y-auto border-r border-border p-2">
+        <div className="flex min-h-0 flex-1 flex-col md:flex-row">
+          {/* Lista de versiones (arriba en móvil, a la izquierda en md+) */}
+          <div className="max-h-40 w-full shrink-0 overflow-y-auto border-b border-border p-2 md:max-h-none md:w-56 md:border-b-0 md:border-r">
             {versions.length === 0 ? (
               <p className="p-3 text-xs leading-relaxed text-muted-foreground">
                 Aún no hay versiones. Se guardan solas mientras escribes, o pulsa

@@ -189,7 +189,7 @@ function EventEditModal({
 
   return (
     <Modal open onClose={onClose} title="Editar evento" width="max-w-lg">
-      <div className="max-h-[70vh] space-y-4 overflow-y-auto px-5 py-5">
+      <div className="space-y-4 px-5 py-5">
         <div>
           <Label>Título</Label>
           <Input

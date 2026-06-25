@@ -101,13 +101,15 @@ export function Modal({
         aria-labelledby={title !== undefined ? titleId : undefined}
         tabIndex={-1}
         className={cn(
-          'animate-pop-in relative z-10 max-h-[90vh] w-full overflow-hidden rounded-2xl border border-border bg-card text-card-foreground shadow-2xl focus:outline-none',
+          // flex-col + altura máxima: la cabecera queda fija y el cuerpo scrollea,
+          // así en móvil nunca se corta el contenido (ni los botones de abajo).
+          'animate-pop-in relative z-10 flex max-h-[90dvh] w-full flex-col overflow-hidden rounded-2xl border border-border bg-card text-card-foreground shadow-2xl focus:outline-none',
           width,
           className,
         )}
       >
         {title !== undefined && (
-          <div className="flex items-center justify-between border-b border-border px-5 py-4">
+          <div className="flex shrink-0 items-center justify-between border-b border-border px-5 py-4">
             <h2 id={titleId} className="text-lg font-semibold">
               {title}
             </h2>
@@ -120,7 +122,10 @@ export function Modal({
             </button>
           </div>
         )}
-        {children}
+        {/* Cuerpo scrollable (un único scroll fiable en cualquier pantalla). */}
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+          {children}
+        </div>
       </div>
     </div>,
     document.body,

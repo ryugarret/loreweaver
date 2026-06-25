@@ -590,7 +590,7 @@ export function TimelinePage() {
         title="Nuevo evento — ¿dónde?"
         width="max-w-sm"
       >
-        <div className="max-h-[65vh] space-y-4 overflow-y-auto px-5 py-5">
+        <div className="space-y-4 px-5 py-5">
           <div>
             <Label>Título</Label>
             <Input
