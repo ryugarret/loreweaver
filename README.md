@@ -1,32 +1,44 @@
-# React + TypeScript + Vite
+# Loreweaver
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+> A tiny writter helper, as every one i find is paid adn kinda limited
 
-Currently, two official plugins are available:
+Estudio de escritura y *worldbuilding* **100% local y offline**. Sin cuentas, sin
+servidores, sin IA: todos los datos viven en tu navegador (IndexedDB).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Escribir** — editor de capítulos con formato, sangrías y diálogos, historial
+  de versiones (tipo Google Docs) y exportación a PDF/Word/HTML.
+- **Wiki** — fichas de personajes, lugares, facciones, objetos… con imágenes.
+- **Relaciones** — grafo de vínculos y *árbol genealógico* automático.
+- **Línea de tiempo** — vistas de lista, carriles por trama y cronología.
+- **Tablero** de notas, **Progreso** (rachas y objetivos) y modo enfoque
+  (Pomodoro, sonidos de ambiente, música).
 
-## React Compiler
+La interfaz es responsive (escritorio, tablet y móvil) e instalable como PWA.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Desarrollo
 
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+npm run dev      # http://localhost:5173
+npm run build    # comprueba tipos + compila a dist/
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## Versión portable (PC con Windows, sin instalar nada)
+
+```bash
+npm run portable
+```
+
+Genera `Loreweaver-portable.zip`: un lanzador `.bat` que sirve la app con un
+servidor de PowerShell (incluido en Windows). El betatester no instala nada.
+
+## Publicar en GitHub Pages
+
+El repo incluye un flujo de GitHub Actions (`.github/workflows/deploy.yml`) que
+compila y publica en cada `push` a `main`. La ruta base se ajusta sola al nombre
+del repo. Activa **Settings → Pages → Source: GitHub Actions** (o se activa solo
+en el primer despliegue). La app queda en `https://USUARIO.github.io/REPO/`.
+
+> Los datos son por origen (dominio): cada versión (portable, GitHub Pages…)
+> guarda por separado. Usa **Guardar copia / Abrir copia** (un `.json`) para
+> moverlos entre dispositivos.
