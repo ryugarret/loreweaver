@@ -581,10 +581,16 @@ lista de capítulos.
 - ⚠️ Pendiente real: el guardado en disco (File System Access) NO existe en Safari iOS →
   en iPad usar "Guardar/Abrir copia".
 
-**Despliegue a GitHub Pages — PREPARADO (falta el push del usuario).** `.github/workflows/
-deploy.yml` (build + deploy con `actions/configure-pages` → `base_path` automático e
-`enablement: true`), `vite.config.ts` lee `VITE_BASE` (normaliza barras; `/` en local).
-HashRouter evita el 404 de SPA en Pages. Repo git ya iniciado (`main`) con commit; falta
-crear el repo en GitHub + `git push` + (auto) Pages. Aviso: datos por ORIGEN → Pages
-(`usuario.github.io`) y portable (`localhost:8787`) NO comparten datos; mover con copia
-`.json`.
+**Despliegue a GitHub Pages — DESPLEGADO ✅ → https://ryugarret.github.io/loreweaver/**
+Repo: `github.com/ryugarret/loreweaver` (PÚBLICO). `.github/workflows/deploy.yml` (build +
+`actions/configure-pages` → `base_path` automático + `upload-pages-artifact` +
+`deploy-pages`), `vite.config.ts` lee `VITE_BASE` (normaliza barras; `/` en local).
+HashRouter evita el 404 de SPA en Pages. Cada `push` a `main` redespliega solo (verificado:
+index/JS/manifest/sw/iconos a 200 bajo `/loreweaver/`).
+- ⚠️ **Gotchas que costaron 2 intentos fallidos:** (1) Pages en cuenta gratis SOLO publica
+  desde repo **PÚBLICO** (privado → deploy falla / inaccesible). (2) `configure-pages` con
+  `enablement: true` **falla** ("Configurar Pages" rojo) porque el GITHUB_TOKEN por defecto
+  no puede CREAR el sitio Pages → hubo que **activar Pages a mano** (Settings → Pages →
+  Source: **GitHub Actions**) y QUITAR `enablement` (ahora solo lo lee).
+- Datos por ORIGEN: Pages (`ryugarret.github.io`) y portable (`localhost:8787`) NO comparten
+  datos; mover con copia `.json`. iOS: sin disco real → usar "Guardar/Abrir copia".
