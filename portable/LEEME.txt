@@ -1,0 +1,66 @@
+============================================================
+  LOREWEAVER — estudio de escritura (versión portable)
+============================================================
+
+QUÉ ES
+  Una app para escribir tu novela en tu propio ordenador.
+  Incluye: editor de capítulos con historial de versiones,
+  wiki de personajes y lugares (con imágenes), mapa de
+  relaciones, árbol genealógico, línea de tiempo, tablero de
+  notas y estadísticas de progreso. Funciona 100% en local,
+  sin internet, sin cuentas y SIN INSTALAR NADA.
+
+
+CÓMO ABRIRLA  (Windows)
+  1. Haz doble clic en   «Iniciar Loreweaver.bat»
+  2. Se abre una ventana negra (es el motor; déjala abierta).
+  3. La app se abre sola en tu navegador.
+  4. Para CERRAR la app: cierra la ventana negra.
+
+  * Si Windows muestra un aviso azul de "SmartScreen":
+    pulsa "Más información" y luego "Ejecutar de todas formas".
+    Es seguro: es un script local, no descarga nada de internet.
+
+
+CÓMO MOVERTE POR LA APP
+  A la izquierda tienes el menú con todas las secciones:
+  Escribir · Wiki · Relaciones · Línea de tiempo · Tablero ·
+  Progreso · Guía.
+
+  - "Guía" abre un manual completo dentro de la app que explica
+    cada sección con detalle. Léela con la app delante.
+  - Abajo del menú están los botones de contraer el menú,
+    cambiar entre tema claro/oscuro y AJUSTES (la rueda dentada).
+  - Abajo a la derecha hay un botón redondo para el modo enfoque:
+    temporizador Pomodoro, sonidos de ambiente y música.
+
+
+RECOMENDADO: USA CHROME O EDGE
+  Con Chrome o Edge puedes activar el GUARDADO EN DISCO REAL:
+  ve a  Ajustes (rueda dentada)  ->  "Guardado en disco real"
+  ->  "Vincular archivo de guardado", y elige dónde guardar.
+  La app mantendrá ese archivo al día automáticamente.
+
+  En otros navegadores (p. ej. Firefox) esa opción no aparece;
+  en su lugar usa "Guardar copia" / "Abrir copia" para llevar
+  tus datos a un archivo cuando quieras.
+
+
+DÓNDE ESTÁN TUS DATOS
+  Mientras escribes, los datos viven en tu navegador (en este
+  ordenador). Para tenerlos también como archivo en el disco,
+  usa el guardado en disco real o "Guardar copia". Haz copias
+  de vez en cuando: son un único archivo .json que puedes mover
+  o enviar a otro ordenador y abrir con "Abrir copia".
+
+
+PROBLEMAS
+  - "No encuentro la carpeta dist": asegúrate de tener la
+    carpeta completa tal cual te la pasaron (sin sacar archivos).
+  - "El puerto 8787 está ocupado" / "Loreweaver ya parece estar
+    abierto": ya lo tienes abierto en otra ventana negra. Usa esa,
+    o ciérrala antes de volver a abrir. No hace falta reiniciar el
+    ordenador: al cerrar la ventana negra el puerto se libera solo.
+  - La app se abre en blanco: espera un segundo y recarga la
+    página (F5); deja siempre la ventana negra abierta.
+============================================================

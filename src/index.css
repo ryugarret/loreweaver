@@ -1,0 +1,201 @@
+@import "tailwindcss";
+
+/* Modo noche basado en la clase .dark del <html> */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Tokens de diseño -> generan utilidades (bg-background, text-foreground, etc.)
+   Usamos "inline" para que las variables se resuelvan en tiempo de ejecucion
+   y el cambio claro/oscuro funcione sin recompilar. */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-ring: var(--accent);
+  --color-danger: var(--danger);
+
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-serif: "Literata", Georgia, "Times New Roman", serif;
+}
+
+/* Paleta — Modo claro (pergamino calido) */
+:root {
+  --background: #f7f6f3;
+  --foreground: #211f1d;
+  --card: #ffffff;
+  --card-foreground: #211f1d;
+  --muted: #efece6;
+  --muted-foreground: #6f6a62;
+  --border: #e6e1d8;
+  --input: #e6e1d8;
+  --accent: #8b5cf6;
+  --accent-foreground: #ffffff;
+  --danger: #e1483a;
+}
+
+/* Paleta — Modo noche (espacio profundo) */
+.dark {
+  --background: #131119;
+  --foreground: #eceaf3;
+  --card: #1b1924;
+  --card-foreground: #eceaf3;
+  --muted: #262333;
+  --muted-foreground: #9a94aa;
+  --border: #2c2939;
+  --input: #2c2939;
+  --accent: #8b5cf6;
+  --accent-foreground: #ffffff;
+  --danger: #f0584a;
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection {
+    background: color-mix(in srgb, var(--accent) 28%, transparent);
+  }
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 9999px;
+    border: 3px solid transparent;
+    background-clip: padding-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--muted-foreground);
+    background-clip: padding-box;
+  }
+}
+
+/* Animaciones reutilizables */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes pop-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.animate-fade-in { animation: fade-in 0.18s ease-out; }
+.animate-pop-in { animation: pop-in 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
+
+/* Respeta "reducir movimiento" del sistema operativo (accesibilidad) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Editor de manuscrito (Tiptap) */
+.tiptap {
+  outline: none;
+}
+.tiptap p {
+  margin: 0 0 1em;
+  /* Sangría de primera línea (estilo libro), como el manuscrito exportado. */
+  text-indent: 1.4em;
+}
+/* El primer párrafo va a ras por convención… */
+.tiptap > p:first-of-type {
+  text-indent: 0;
+}
+/* …el botón puede quitar la sangría en cualquier párrafo… */
+.tiptap p.no-sangria {
+  text-indent: 0;
+}
+/* …o forzarla (incluido el primero). Va al final para ganar al :first-of-type. */
+.tiptap p.sangria-on {
+  text-indent: 1.4em;
+}
+.tiptap > *:first-child {
+  margin-top: 0;
+}
+.tiptap h1,
+.tiptap h2,
+.tiptap h3 {
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 1.4em 0 0.5em;
+}
+.tiptap h1 { font-size: 1.7em; }
+.tiptap h2 { font-size: 1.4em; }
+.tiptap h3 { font-size: 1.18em; }
+.tiptap blockquote {
+  border-left: 3px solid var(--accent);
+  padding-left: 1em;
+  margin: 0 0 1em;
+  color: var(--muted-foreground);
+  font-style: italic;
+}
+.tiptap ul,
+.tiptap ol {
+  padding-left: 1.4em;
+  margin: 0 0 1em;
+}
+.tiptap ul { list-style: disc; }
+.tiptap ol { list-style: decimal; }
+.tiptap hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 1.6em 0;
+}
+.tiptap strong { font-weight: 600; }
+.tiptap em { font-style: italic; }
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: var(--muted-foreground);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+.mention {
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  color: var(--accent);
+  border-radius: 5px;
+  padding: 1px 5px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.mention:hover {
+  background: color-mix(in srgb, var(--accent) 26%, transparent);
+}
+
+/* Editor pequeño con menciones (descripciones de evento, etc.) */
+.mention-input {
+  outline: none;
+}
+.mention-input p {
+  margin: 0;
+}
