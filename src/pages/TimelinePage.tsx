@@ -221,7 +221,7 @@ function EventCard({
       />
 
       <div className="mb-3 rounded-2xl border border-border bg-card p-4 transition hover:shadow-sm">
-        <div className="flex items-start gap-2">
+        <div className="flex flex-wrap items-start gap-2">
           <input
             value={dateLabel}
             onChange={(e) => {
@@ -229,7 +229,7 @@ function EventCard({
               save({ dateLabel: e.target.value })
             }}
             placeholder="Fecha / era…"
-            className="w-36 shrink-0 rounded-md bg-muted px-2 py-1 text-xs font-medium text-muted-foreground outline-none focus:ring-2 focus:ring-ring/30"
+            className="w-32 shrink-0 rounded-md bg-muted px-2 py-1 text-xs font-medium text-muted-foreground outline-none focus:ring-2 focus:ring-ring/30 sm:w-36"
           />
           <select
             value={event.lane ?? ''}
@@ -241,7 +241,7 @@ function EventCard({
             }
             title="Trama / carril (para la vista visual)"
             aria-label="Trama del evento"
-            className="w-32 shrink-0 cursor-pointer rounded-md bg-muted px-2 py-1 text-xs font-medium text-muted-foreground outline-none focus:ring-2 focus:ring-ring/30"
+            className="w-28 shrink-0 cursor-pointer rounded-md bg-muted px-2 py-1 text-xs font-medium text-muted-foreground outline-none focus:ring-2 focus:ring-ring/30 sm:w-32"
           >
             <option value="">Sin trama</option>
             {lanes.map((l) => (
@@ -250,8 +250,7 @@ function EventCard({
               </option>
             ))}
           </select>
-          <div className="flex-1" />
-          <div className="flex shrink-0 items-center gap-0.5">
+          <div className="ml-auto flex shrink-0 items-center gap-0.5">
             <button
               disabled={index === 0}
               onClick={() => onMove(-1)}
@@ -476,7 +475,7 @@ export function TimelinePage() {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex items-center justify-between gap-3 border-b border-border px-6 py-3.5">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3 sm:px-6 sm:py-3.5">
         <div>
           <h1 className="font-serif text-xl font-semibold">Línea de tiempo</h1>
           <p className="text-xs text-muted-foreground">

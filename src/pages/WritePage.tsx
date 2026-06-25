@@ -9,6 +9,7 @@ import {
   PenLine,
   Maximize2,
   Minimize2,
+  PanelLeft,
 } from 'lucide-react'
 import { db, type Chapter } from '@/lib/db'
 import { createChapter, deleteChapter } from '@/lib/repo'
@@ -29,6 +30,8 @@ export function WritePage() {
   const navigate = useNavigate()
   const [focus, setFocus] = useState(false)
   const [toDelete, setToDelete] = useState<Chapter | null>(null)
+  // Cajón de capítulos en móvil (< md). En md+ la lista es fija.
+  const [chaptersOpen, setChaptersOpen] = useState(false)
 
   const chapters = useLiveQuery(
     () =>
@@ -67,10 +70,23 @@ export function WritePage() {
     chapters?.reduce((sum, c) => sum + c.wordCount, 0) ?? 0
 
   return (
-    <div className="flex h-full">
-      {/* Lista de capítulos */}
+    <div className="relative flex h-full">
+      {/* Fondo del cajón de capítulos (solo móvil) */}
+      {!focus && chaptersOpen && (
+        <div
+          className="absolute inset-0 z-20 bg-black/40 md:hidden"
+          onClick={() => setChaptersOpen(false)}
+        />
+      )}
+      {/* Lista de capítulos: fija en md+, cajón deslizante en móvil */}
       {!focus && (
-        <div className="flex w-72 shrink-0 flex-col border-r border-border bg-card/40">
+        <div
+          className={cn(
+            'z-30 flex w-72 max-w-[85vw] shrink-0 flex-col border-r border-border bg-card transition-transform duration-200',
+            'absolute inset-y-0 left-0 md:static md:max-w-none md:translate-x-0 md:bg-card/40',
+            chaptersOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0',
+          )}
+        >
           <div className="flex items-center justify-between px-4 py-3.5">
             <div>
               <h2 className="font-serif text-base font-semibold">Capítulos</h2>
@@ -92,7 +108,10 @@ export function WritePage() {
               return (
                 <div
                   key={ch.id}
-                  onClick={() => navigate(`/p/${projectId}/write/${ch.id}`)}
+                  onClick={() => {
+                    navigate(`/p/${projectId}/write/${ch.id}`)
+                    setChaptersOpen(false)
+                  }}
                   className={cn(
                     'group cursor-pointer rounded-lg border px-3 py-2.5 transition',
                     active
@@ -157,31 +176,59 @@ export function WritePage() {
       )}
 
       {/* Editor */}
-      <div className="relative flex-1 overflow-y-auto">
-        <button
-          onClick={() => setFocus((f) => !f)}
-          title={focus ? 'Salir del modo enfoque' : 'Modo enfoque'}
-          className="absolute right-4 top-4 z-20 flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition hover:bg-muted hover:text-foreground"
-        >
-          {focus ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
-        </button>
-
-        {current ? (
-          <ChapterEditor key={current.id} chapter={current} />
-        ) : (
-          <div className="flex h-full items-center justify-center p-8">
-            <EmptyState
-              icon={<PenLine size={26} />}
-              title="Tu manuscrito empieza aquí"
-              description="Crea tu primer capítulo y empieza a escribir. Todo se guarda solo en tu ordenador."
-              action={
-                <Button onClick={handleNew}>
-                  <Plus size={18} /> Crear capítulo
-                </Button>
-              }
-            />
+      <div className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
+        {/* Barra solo en móvil: abrir capítulos + entrar en enfoque */}
+        {!focus && (
+          <div className="flex shrink-0 items-center justify-between border-b border-border px-3 py-2 md:hidden">
+            <button
+              onClick={() => setChaptersOpen(true)}
+              aria-label="Ver capítulos"
+              className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground"
+            >
+              <PanelLeft size={16} /> Capítulos
+            </button>
+            <button
+              onClick={() => setFocus(true)}
+              aria-label="Modo enfoque"
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition hover:bg-muted hover:text-foreground"
+            >
+              <Maximize2 size={18} />
+            </button>
           </div>
         )}
+
+        <div className="relative flex-1 overflow-y-auto">
+          {/* Enfoque: en escritorio siempre visible (entrar/salir); en móvil solo
+              para SALIR (entrar se hace desde la barra de arriba). */}
+          <button
+            onClick={() => setFocus((f) => !f)}
+            title={focus ? 'Salir del modo enfoque' : 'Modo enfoque'}
+            aria-label={focus ? 'Salir del modo enfoque' : 'Modo enfoque'}
+            className={cn(
+              'absolute right-4 top-4 z-20 h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition hover:bg-muted hover:text-foreground',
+              focus ? 'flex' : 'hidden md:flex',
+            )}
+          >
+            {focus ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
+          </button>
+
+          {current ? (
+            <ChapterEditor key={current.id} chapter={current} />
+          ) : (
+            <div className="flex h-full items-center justify-center p-8">
+              <EmptyState
+                icon={<PenLine size={26} />}
+                title="Tu manuscrito empieza aquí"
+                description="Crea tu primer capítulo y empieza a escribir. Todo se guarda solo en tu ordenador."
+                action={
+                  <Button onClick={handleNew}>
+                    <Plus size={18} /> Crear capítulo
+                  </Button>
+                }
+              />
+            </div>
+          )}
+        </div>
       </div>
 
       <ConfirmDialog

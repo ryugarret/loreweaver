@@ -563,3 +563,28 @@ script).**
 - `ProjectCover` admite `scrim={false}` (sin velo) para miniaturas. `ProjectLayout` muestra
   una miniatura de la portada (h-9 w-9) junto al título en la cabecera del menú lateral
   (solo con el menú expandido).
+
+**Responsive para tablet/móvil (esta sesión) — HECHO ✅ (verificado en preview a 375 y
+768px + escritorio).** Breakpoint clave: `lg` (1024px) para el menú; `md` (768px) para la
+lista de capítulos.
+- `ProjectLayout`: el menú lateral es **fijo en `lg+`** y **cajón deslizante** (off-canvas
+  con backdrop) por debajo, abierto con una **hamburguesa** en una barra superior móvil
+  (`lg:hidden`). El colapso (240↔64) sigue siendo solo de escritorio. Estado `mobileNav`;
+  se cierra al navegar (`useLocation`) o pulsar un enlace.
+- `WritePage`: la lista de capítulos (`w-72`) es **fija en `md+`** y **cajón** en móvil
+  (botón "Capítulos" en una barra `md:hidden`). El toggle de enfoque: flotante en
+  escritorio (entrar/salir); en móvil se entra desde la barra y se sale con un botón
+  flotante que solo aparece en modo enfoque.
+- Anti-desbordes: `FocusDock` `w-[min(380px,calc(100vw-2.5rem))]`; cabeceras de grafo y
+  timeline con `flex-wrap`/apilado en móvil; fila de fecha/trama/botones de cada evento con
+  `flex-wrap` + `ml-auto`. Wiki y Proyectos ya eran responsive (grids que apilan).
+- ⚠️ Pendiente real: el guardado en disco (File System Access) NO existe en Safari iOS →
+  en iPad usar "Guardar/Abrir copia".
+
+**Despliegue a GitHub Pages — PREPARADO (falta el push del usuario).** `.github/workflows/
+deploy.yml` (build + deploy con `actions/configure-pages` → `base_path` automático e
+`enablement: true`), `vite.config.ts` lee `VITE_BASE` (normaliza barras; `/` en local).
+HashRouter evita el 404 de SPA en Pages. Repo git ya iniciado (`main`) con commit; falta
+crear el repo en GitHub + `git push` + (auto) Pages. Aviso: datos por ORIGEN → Pages
+(`usuario.github.io`) y portable (`localhost:8787`) NO comparten datos; mover con copia
+`.json`.

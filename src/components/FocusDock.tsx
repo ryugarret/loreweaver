@@ -149,7 +149,7 @@ export function FocusDock() {
     <div className="pointer-events-none fixed bottom-5 right-5 z-30 flex flex-col items-end gap-3">
       <div
         className={cn(
-          'w-[380px] origin-bottom-right overflow-hidden rounded-2xl border border-border bg-card shadow-2xl transition-all duration-200',
+          'w-[min(380px,calc(100vw-2.5rem))] origin-bottom-right overflow-hidden rounded-2xl border border-border bg-card shadow-2xl transition-all duration-200',
           open
             ? 'pointer-events-auto translate-y-0 scale-100 opacity-100'
             : 'pointer-events-none translate-y-3 scale-95 opacity-0',

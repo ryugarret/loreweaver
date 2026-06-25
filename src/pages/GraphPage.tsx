@@ -627,10 +627,10 @@ function GraphInner() {
       )}
 
       {/* Cabecera flotante */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-3 p-4">
+      <div className="pointer-events-none absolute inset-x-0 top-0 flex flex-col gap-2 p-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="pointer-events-auto rounded-xl border border-border bg-card/90 px-3.5 py-2 shadow-sm backdrop-blur">
           <h1 className="font-serif text-lg font-semibold">Relaciones</h1>
-          <p className="text-xs text-muted-foreground">
+          <p className="hidden text-xs text-muted-foreground sm:block">
             Clic en un nodo = resaltar vecinos · doble clic = abrir ficha · arrastra entre nodos para enlazar
           </p>
         </div>
