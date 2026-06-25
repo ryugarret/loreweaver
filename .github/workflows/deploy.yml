@@ -29,13 +29,11 @@ jobs:
           node-version: 20
           cache: npm
 
-      # Da la base_path correcta (/REPO para un repo normal, / para usuario.github.io)
-      # y activa GitHub Pages automáticamente la primera vez (enablement).
+      # Da la base_path correcta (/REPO para un repo normal, / para usuario.github.io).
+      # Requiere que Pages esté activado en Settings → Pages → Source: GitHub Actions.
       - name: Configurar Pages
         id: pages
         uses: actions/configure-pages@v5
-        with:
-          enablement: true
 
       - run: npm ci
 
