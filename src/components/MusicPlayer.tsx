@@ -205,7 +205,7 @@ export function MusicPlayer({ visible }: { visible: boolean }) {
               </span>
               <button
                 onClick={() => remove(t.id)}
-                className="shrink-0 text-muted-foreground opacity-0 transition hover:text-danger group-hover:opacity-100"
+                className="shrink-0 text-muted-foreground transition hover:text-danger"
               >
                 <Trash2 size={14} />
               </button>

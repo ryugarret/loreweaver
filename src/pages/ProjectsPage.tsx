@@ -73,7 +73,7 @@ function ProjectCard({
           </p>
         </div>
       </Link>
-      <div className="absolute right-3 top-3 flex gap-1.5 opacity-0 transition group-hover:opacity-100">
+      <div className="absolute right-3 top-3 flex gap-1.5">
         <button
           onClick={onEdit}
           title="Editar proyecto"

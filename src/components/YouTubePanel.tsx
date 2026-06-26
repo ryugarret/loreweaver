@@ -135,7 +135,7 @@ export function YouTubePanel({ visible }: { visible: boolean }) {
                 onClick={() => db.yt.delete(it.id)}
                 aria-label="Eliminar vídeo"
                 title="Eliminar"
-                className="shrink-0 text-muted-foreground opacity-0 transition hover:text-danger group-hover:opacity-100"
+                className="shrink-0 text-muted-foreground transition hover:text-danger"
               >
                 <Trash2 size={14} />
               </button>

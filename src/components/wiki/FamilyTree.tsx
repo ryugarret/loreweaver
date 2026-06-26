@@ -421,7 +421,7 @@ export function FamilyTree({
                           onOpenEntry(n.id)
                         }}
                         title="Abrir ficha"
-                        className="absolute right-1 top-1 rounded-md p-1 text-muted-foreground opacity-0 transition hover:bg-muted hover:text-foreground group-hover:opacity-100"
+                        className="absolute right-1 top-1 rounded-md p-1 text-muted-foreground transition hover:bg-muted hover:text-foreground"
                       >
                         <BookOpen size={13} />
                       </button>

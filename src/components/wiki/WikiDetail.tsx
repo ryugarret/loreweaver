@@ -274,7 +274,7 @@ export function WikiDetail({
                           Portada
                         </span>
                       )}
-                      <div className="absolute inset-0 flex items-center justify-center gap-1.5 bg-black/45 opacity-0 transition group-hover:opacity-100">
+                      <div className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-1.5 bg-gradient-to-t from-black/70 to-transparent px-1 pb-1.5 pt-5">
                         <button
                           onClick={() => update({ coverImageId: img.id })}
                           title="Usar de portada"

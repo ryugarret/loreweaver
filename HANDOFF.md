@@ -585,6 +585,12 @@ lista de capítulos.
   editar evento). `WikiDetail` (panel) ya scrollea; `ChapterHistory` ahora apila las dos
   columnas en móvil (`flex-col md:flex-row`). Verificado a 375px: Ajustes/editar proyecto/
   nuevo evento/ficha llegan a sus botones del fondo.
+- **TÁCTIL — REGLA: ningún control oculto hasta el hover** (`opacity-0 group-hover:opacity-100`):
+  en táctil (iPad/Android/móvil) NO hay hover → invisibles e inalcanzables = regresión. Se
+  hicieron SIEMPRE visibles: subir/bajar/borrar de capítulos (WritePage), editar/borrar de
+  proyectos (ProjectsPage), borrar pista (MusicPlayer) y vídeo (YouTubePanel), "abrir ficha"
+  del árbol (FamilyTree), y portada/borrar de imágenes de ficha (WikiDetail, barra inferior).
+  Antes de mergear UI nueva: ningún affordance puede depender SOLO del hover.
 - ⚠️ Pendiente real: el guardado en disco (File System Access) NO existe en Safari iOS →
   en iPad usar "Guardar/Abrir copia".
 
