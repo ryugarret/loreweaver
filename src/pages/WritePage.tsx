@@ -102,7 +102,7 @@ export function WritePage() {
             </div>
           </div>
           <div className="flex-1 space-y-1 overflow-y-auto px-2 pb-4">
-            {chapters?.map((ch, i) => {
+            {chapters?.map((ch, i, arr) => {
               const sm = statusMeta(ch.status)
               const active = ch.id === chapterId
               return (
@@ -133,38 +133,43 @@ export function WritePage() {
                         {ch.wordCount.toLocaleString('es-ES')} palabras
                       </p>
                     </div>
-                    <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition group-hover:opacity-100">
+                    <div className="flex shrink-0 items-center gap-0.5">
                       <div className="flex flex-col">
                         <button
                           title="Subir"
+                          aria-label="Subir capítulo"
+                          disabled={i === 0}
                           onClick={(e) => {
                             e.stopPropagation()
                             move(ch, -1)
                           }}
-                          className="text-muted-foreground hover:text-foreground"
+                          className="rounded p-0.5 text-muted-foreground transition hover:text-foreground disabled:opacity-25"
                         >
-                          <ChevronUp size={14} />
+                          <ChevronUp size={15} />
                         </button>
                         <button
                           title="Bajar"
+                          aria-label="Bajar capítulo"
+                          disabled={i === arr.length - 1}
                           onClick={(e) => {
                             e.stopPropagation()
                             move(ch, 1)
                           }}
-                          className="text-muted-foreground hover:text-foreground"
+                          className="rounded p-0.5 text-muted-foreground transition hover:text-foreground disabled:opacity-25"
                         >
-                          <ChevronDown size={14} />
+                          <ChevronDown size={15} />
                         </button>
                       </div>
                       <button
                         title="Eliminar capítulo"
+                        aria-label="Eliminar capítulo"
                         onClick={(e) => {
                           e.stopPropagation()
                           setToDelete(ch)
                         }}
-                        className="text-muted-foreground hover:text-danger"
+                        className="rounded p-1.5 text-muted-foreground transition hover:bg-danger/10 hover:text-danger"
                       >
-                        <Trash2 size={14} />
+                        <Trash2 size={15} />
                       </button>
                     </div>
                   </div>
