@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { X, Sparkles } from 'lucide-react'
+import { X, Sparkles, Crosshair } from 'lucide-react'
 import { analyzeText } from '@/lib/textAnalysis'
 import { cn } from '@/lib/utils'
 
@@ -7,9 +7,12 @@ import { cn } from '@/lib/utils'
 export function StyleAnalysis({
   content,
   onClose,
+  onLocate,
 }: {
   content: string
   onClose: () => void
+  /** Salta a esa palabra en el editor y la resalta un momento. */
+  onLocate: (word: string) => void
 }) {
   const r = useMemo(() => analyzeText(content), [content])
 
@@ -119,19 +122,29 @@ export function StyleAnalysis({
 
           <Section
             title="Ecos (misma palabra muy cerca)"
-            hint="La misma palabra repetida a poca distancia suele cantar al leer."
+            hint="Toca uno para saltar a él en el texto y verlo resaltado un momento."
             empty={r.closeRepeats.length === 0}
           >
             <ul className="space-y-1.5">
               {r.closeRepeats.map((c) => (
-                <li
-                  key={c.word}
-                  className="flex items-center justify-between gap-3 rounded-lg bg-muted/50 px-3 py-1.5 text-sm"
-                >
-                  <span className="font-medium">{c.word}</span>
-                  <span className="shrink-0 text-xs text-muted-foreground">
-                    a {c.distance} palabras
-                  </span>
+                <li key={c.word}>
+                  <button
+                    type="button"
+                    onClick={() => onLocate(c.word)}
+                    title={`Ir a «${c.word}» en el texto`}
+                    className="group flex w-full items-center justify-between gap-3 rounded-lg bg-muted/50 px-3 py-1.5 text-left text-sm transition hover:bg-muted"
+                  >
+                    <span className="min-w-0 flex-1 truncate font-medium">
+                      {c.word}
+                    </span>
+                    <span className="flex shrink-0 items-center gap-1.5 text-xs text-muted-foreground">
+                      a {c.distance} palabras
+                      <Crosshair
+                        size={13}
+                        className="text-muted-foreground/60 transition group-hover:text-accent"
+                      />
+                    </span>
+                  </button>
                 </li>
               ))}
             </ul>

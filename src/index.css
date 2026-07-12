@@ -105,6 +105,31 @@
 .animate-fade-in { animation: fade-in 0.18s ease-out; }
 .animate-pop-in { animation: pop-in 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
 
+/* Resaltado temporal al "ubicar" un eco desde el panel de Estilo (se desvanece). */
+.locate-flash {
+  border-radius: 3px;
+  background-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 40%, transparent);
+  animation: locate-flash 2.1s ease-out forwards;
+}
+@keyframes locate-flash {
+  0% {
+    background-color: color-mix(in srgb, var(--accent) 60%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 50%, transparent);
+  }
+  75% {
+    background-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: 0 0 0 3px transparent;
+  }
+}
+/* Sin animación queda sólido hasta que JS lo limpia (respeta "reducir movimiento"). */
+@media (prefers-reduced-motion: reduce) {
+  .locate-flash { animation: none; }
+}
+
 /* Respeta "reducir movimiento" del sistema operativo (accesibilidad) */
 @media (prefers-reduced-motion: reduce) {
   *,
