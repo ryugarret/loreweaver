@@ -20,6 +20,7 @@ import {
   Check,
   Loader2,
   History,
+  Sparkles,
   MessageSquare,
   Pilcrow,
   IndentIncrease,
@@ -33,6 +34,7 @@ import {
   ensureChapterBaseline,
 } from '@/lib/repo'
 import { ChapterHistory } from './ChapterHistory'
+import { StyleAnalysis } from './StyleAnalysis'
 import { ManuscriptFormat } from './manuscriptFormat'
 import { setActiveEditorFlush } from '@/lib/editorFlush'
 import { cn, countWords, now } from '@/lib/utils'
@@ -268,6 +270,7 @@ export function ChapterEditor({ chapter }: { chapter: Chapter }) {
   const [words, setWords] = useState(chapter.wordCount)
   const [saved, setSaved] = useState(true)
   const [historyOpen, setHistoryOpen] = useState(false)
+  const [styleOpen, setStyleOpen] = useState(false)
 
   const patchData = useRef<Partial<Chapter>>({})
   const patchTimer = useRef<number | null>(null)
@@ -322,6 +325,9 @@ export function ChapterEditor({ chapter }: { chapter: Chapter }) {
     },
     editorProps: {
       attributes: {
+        // Corrector ortográfico nativo del navegador (subrayado rojo), en todos
+        // los idiomas que tenga el dispositivo. Sin diccionarios que inflen la app.
+        spellcheck: 'true',
         class: cn(
           'tiptap min-h-[55vh] max-w-none leading-[1.85]',
           editorFont === 'serif'
@@ -419,16 +425,28 @@ export function ChapterEditor({ chapter }: { chapter: Chapter }) {
             </>
           )}
         </span>
-        <button
-          onClick={() => {
-            void flushPatch() // que el diff "vs actual" use lo último escrito
-            setHistoryOpen(true)
-          }}
-          title="Historial de versiones"
-          className="ml-auto flex items-center gap-1 rounded-md px-2 py-1 transition hover:bg-muted hover:text-foreground"
-        >
-          <History size={13} /> Historial
-        </button>
+        <div className="ml-auto flex items-center gap-1">
+          <button
+            onClick={() => {
+              void flushPatch()
+              setStyleOpen(true)
+            }}
+            title="Estilo: repeticiones y vocabulario"
+            className="flex items-center gap-1 rounded-md px-2 py-1 transition hover:bg-muted hover:text-foreground"
+          >
+            <Sparkles size={13} /> Estilo
+          </button>
+          <button
+            onClick={() => {
+              void flushPatch() // que el diff "vs actual" use lo último escrito
+              setHistoryOpen(true)
+            }}
+            title="Historial de versiones"
+            className="flex items-center gap-1 rounded-md px-2 py-1 transition hover:bg-muted hover:text-foreground"
+          >
+            <History size={13} /> Historial
+          </button>
+        </div>
       </div>
 
       {/* Barra de herramientas (sticky) */}
@@ -446,6 +464,13 @@ export function ChapterEditor({ chapter }: { chapter: Chapter }) {
           chapter={chapter}
           onClose={() => setHistoryOpen(false)}
           onRestored={handleRestored}
+        />
+      )}
+
+      {styleOpen && editor && (
+        <StyleAnalysis
+          content={editor.getHTML()}
+          onClose={() => setStyleOpen(false)}
         />
       )}
     </div>

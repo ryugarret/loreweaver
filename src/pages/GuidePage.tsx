@@ -25,7 +25,7 @@ const SECTIONS: { icon: ReactNode; title: string; body: ReactNode }[] = [
   {
     icon: <PenLine size={20} />,
     title: 'Escribir',
-    body: 'El editor de capítulos: barra de formato (negrita, títulos, listas, citas), botón de diálogo (inserta la raya «—» en una línea nueva), sangría de primera línea estilo libro (actívala/quítala por párrafo) y botones de aumentar/disminuir sangría del párrafo entero. Autoguardado y contador de palabras en vivo. Marca el estado de cada capítulo (idea, borrador, revisión, terminado). Escribe «@» para mencionar personajes o lugares de tu wiki. Arriba a la derecha, el modo enfoque oculta todo lo demás.',
+    body: 'El editor de capítulos: barra de formato (negrita, títulos, listas, citas), botón de diálogo (inserta la raya «—» en una línea nueva), sangría de primera línea estilo libro (actívala/quítala por párrafo) y botones de aumentar/disminuir sangría del párrafo entero. Autoguardado y contador de palabras en vivo. El corrector ortográfico del navegador subraya las faltas, y el botón «Estilo» detecta las palabras y frases que repites de más para diversificar el vocabulario. Marca el estado de cada capítulo (idea, borrador, revisión, terminado). Escribe «@» para mencionar personajes o lugares de tu wiki. Arriba a la derecha, el modo enfoque oculta todo lo demás.',
   },
   {
     icon: <History size={20} />,
