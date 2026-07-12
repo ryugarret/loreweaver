@@ -142,6 +142,8 @@ export interface TimelineEvent {
 export interface BoardNode {
   id: string
   projectId: string
+  /** Título opcional de la nota */
+  title?: string
   text: string
   x: number
   y: number

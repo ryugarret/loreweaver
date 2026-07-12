@@ -19,6 +19,9 @@ const NOTE_COLORS = [
   '#e2e8f0',
 ]
 
+const MIN_W = 150
+const MIN_H = 90
+
 function NoteCard({
   node,
   onDelete,
@@ -27,21 +30,29 @@ function NoteCard({
   onDelete: () => void
 }) {
   const [pos, setPos] = useState({ x: node.x, y: node.y })
+  const [size, setSize] = useState({ w: node.w, h: node.h })
+  const [title, setTitle] = useState(node.title ?? '')
   const [text, setText] = useState(node.text)
   const [color, setColor] = useState(node.color)
   const [showColors, setShowColors] = useState(false)
   const timer = useRef<number | null>(null)
+  const pending = useRef<Partial<BoardNode>>({})
 
-  function saveText(value: string) {
+  // Guardado con debounce que acumula campos (título + texto en <350 ms).
+  function save(part: Partial<BoardNode>) {
+    pending.current = { ...pending.current, ...part }
     if (timer.current) window.clearTimeout(timer.current)
     timer.current = window.setTimeout(() => {
-      void db.nodes.update(node.id, { text: value, updatedAt: now() })
+      const data = { ...pending.current, updatedAt: now() }
+      pending.current = {}
+      void db.nodes.update(node.id, data)
     }, 350)
   }
 
   function startDrag(e: ReactPointerEvent) {
     const target = e.target as HTMLElement
-    if (target.closest('textarea, button')) return
+    // No arrastrar la nota si se toca texto, un botón o el asa de redimensionar.
+    if (target.closest('textarea, button, input, [data-resize]')) return
     e.preventDefault()
     const startX = e.clientX
     const startY = e.clientY
@@ -64,15 +75,40 @@ function NoteCard({
     window.addEventListener('pointerup', onUp)
   }
 
+  function startResize(e: ReactPointerEvent) {
+    e.stopPropagation() // que no dispare el arrastre de la nota ni el pan del lienzo
+    e.preventDefault()
+    const startX = e.clientX
+    const startY = e.clientY
+    const startW = size.w
+    const startH = size.h
+    const onMove = (ev: PointerEvent) => {
+      setSize({
+        w: Math.max(MIN_W, startW + (ev.clientX - startX)),
+        h: Math.max(MIN_H, startH + (ev.clientY - startY)),
+      })
+    }
+    const onUp = (ev: PointerEvent) => {
+      window.removeEventListener('pointermove', onMove)
+      window.removeEventListener('pointerup', onUp)
+      const w = Math.max(MIN_W, startW + (ev.clientX - startX))
+      const h = Math.max(MIN_H, startH + (ev.clientY - startY))
+      void db.nodes.update(node.id, { w, h, updatedAt: now() })
+    }
+    window.addEventListener('pointermove', onMove)
+    window.addEventListener('pointerup', onUp)
+  }
+
   return (
     <div
+      data-note
       onPointerDown={startDrag}
       className="absolute flex select-none flex-col rounded-xl shadow-lg ring-1 ring-black/5"
       style={{
         left: pos.x,
         top: pos.y,
-        width: node.w,
-        height: node.h,
+        width: size.w,
+        height: size.h,
         backgroundColor: color,
       }}
     >
@@ -111,21 +147,40 @@ function NoteCard({
           />
         </div>
       )}
+      <input
+        value={title}
+        onChange={(e) => {
+          setTitle(e.target.value)
+          save({ title: e.target.value })
+        }}
+        placeholder="Título…"
+        className="w-full bg-transparent px-3 text-sm font-semibold text-black/80 outline-none placeholder:text-black/25"
+      />
       <textarea
         value={text}
         onChange={(e) => {
           setText(e.target.value)
-          saveText(e.target.value)
+          save({ text: e.target.value })
         }}
         placeholder="Escribe una idea…"
-        className="flex-1 resize-none bg-transparent px-3 pb-3 text-sm text-black/80 outline-none placeholder:text-black/30"
+        className="flex-1 resize-none bg-transparent px-3 pb-3 pt-1 text-sm text-black/80 outline-none placeholder:text-black/30"
       />
+      {/* Asa para redimensionar (esquina inferior derecha) */}
+      <div
+        data-resize
+        onPointerDown={startResize}
+        title="Redimensionar"
+        className="absolute bottom-0 right-0 h-5 w-5 cursor-se-resize"
+      >
+        <div className="absolute bottom-1 right-1 h-2 w-2 border-b-2 border-r-2 border-black/30" />
+      </div>
     </div>
   )
 }
 
 export function BoardPage() {
   const { projectId } = useParams<{ projectId: string }>()
+  const scrollRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLDivElement>(null)
 
   const nodes = useLiveQuery(
@@ -145,13 +200,38 @@ export function BoardPage() {
     await createNode(projectId!, x, y, color)
   }
 
+  // Desplazarse por el lienzo arrastrando con el botón izquierdo (como el grafo).
+  function startPan(e: ReactPointerEvent) {
+    const target = e.target as HTMLElement
+    if (target.closest('[data-note]')) return // sobre una nota → la mueve ella
+    const el = scrollRef.current
+    if (!el) return
+    const startX = e.clientX
+    const startY = e.clientY
+    const startL = el.scrollLeft
+    const startT = el.scrollTop
+    el.classList.add('cursor-grabbing')
+    const onMove = (ev: PointerEvent) => {
+      el.scrollLeft = startL - (ev.clientX - startX)
+      el.scrollTop = startT - (ev.clientY - startY)
+    }
+    const onUp = () => {
+      window.removeEventListener('pointermove', onMove)
+      window.removeEventListener('pointerup', onUp)
+      el.classList.remove('cursor-grabbing')
+    }
+    window.addEventListener('pointermove', onMove)
+    window.addEventListener('pointerup', onUp)
+  }
+
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center justify-between border-b border-border px-6 py-3">
         <div>
           <h1 className="font-serif text-xl font-semibold">Tablero</h1>
           <p className="text-xs text-muted-foreground">
-            Doble clic en el lienzo para crear una nota · arrástralas para ordenar
+            Doble clic para crear una nota · arrastra el lienzo para moverte · la
+            esquina de cada nota la redimensiona
           </p>
         </div>
         <Button
@@ -164,7 +244,11 @@ export function BoardPage() {
         </Button>
       </div>
 
-      <div className="relative flex-1 overflow-auto">
+      <div
+        ref={scrollRef}
+        onPointerDown={startPan}
+        className="relative flex-1 cursor-grab overflow-auto"
+      >
         <div
           ref={canvasRef}
           onDoubleClick={(e) => addNoteAt(e.clientX, e.clientY)}

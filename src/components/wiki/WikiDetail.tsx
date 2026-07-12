@@ -105,7 +105,11 @@ export function WikiDetail({
     if (!files || files.length === 0) return
     setUploading(true)
     try {
-      await addImages(entry.id, entry.projectId, files)
+      const added = await addImages(entry.id, entry.projectId, files)
+      if (added === 0)
+        toast('Ese archivo no es una imagen válida (usa JPG, PNG o WebP).', 'error')
+      else if (added < files.length)
+        toast('Algunos archivos no eran imágenes y se omitieron.', 'info')
     } catch {
       toast('No se pudo subir la imagen', 'error')
     } finally {

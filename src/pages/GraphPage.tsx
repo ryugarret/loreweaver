@@ -344,6 +344,28 @@ function LinkModal({
   )
 }
 
+/** Filtros del grafo persistidos por proyecto (para que NO se pierdan al navegar
+ *  entre menús). Guardados en localStorage como arrays (los Set no son JSON). */
+function loadGraphFilters(projectId: string): { cats: string[]; rels: string[] } {
+  try {
+    const raw = localStorage.getItem(`lw-graph-filters-${projectId}`)
+    if (raw) return JSON.parse(raw)
+  } catch {
+    /* ignore */
+  }
+  return { cats: [], rels: [] }
+}
+function saveGraphFilters(projectId: string, cats: string[], rels: string[]) {
+  try {
+    localStorage.setItem(
+      `lw-graph-filters-${projectId}`,
+      JSON.stringify({ cats, rels }),
+    )
+  } catch {
+    /* ignore */
+  }
+}
+
 function GraphInner() {
   const { projectId } = useParams<{ projectId: string }>()
   const isDark = useResolvedDark()
@@ -371,14 +393,24 @@ function GraphInner() {
   const [editLinkId, setEditLinkId] = useState<string | null>(null)
   const [addOpen, setAddOpen] = useState(false)
   const [focusId, setFocusId] = useState<string | null>(null)
-  const [hiddenCats, setHiddenCats] = useState<Set<WikiType>>(new Set())
-  const [hiddenRels, setHiddenRels] = useState<Set<string>>(new Set())
+  const [hiddenCats, setHiddenCats] = useState<Set<WikiType>>(
+    () => new Set(loadGraphFilters(projectId ?? '').cats as WikiType[]),
+  )
+  const [hiddenRels, setHiddenRels] = useState<Set<string>>(
+    () => new Set(loadGraphFilters(projectId ?? '').rels),
+  )
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [familyOpen, setFamilyOpen] = useState(false)
 
   const catsKey = [...hiddenCats].join(',')
   const relsKey = [...hiddenRels].join(',')
+
+  // Persistir los filtros para que sobrevivan al cambiar de menú.
+  useEffect(() => {
+    if (projectId) saveGraphFilters(projectId, [...hiddenCats], [...hiddenRels])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectId, catsKey, relsKey])
 
   function toggleCat(t: WikiType) {
     setHiddenCats((s) => {

@@ -344,18 +344,24 @@ export async function deleteWiki(entry: WikiEntry): Promise<void> {
 
 /* ====== Imágenes de referencia ====== */
 
+/** Añade imágenes de referencia. Devuelve cuántas se guardaron (para dar feedback
+ *  si el archivo no era una imagen válida). */
 export async function addImages(
   entryId: string,
   projectId: string,
   files: FileList | File[],
-): Promise<void> {
+): Promise<number> {
   const items: ImageAsset[] = []
   let i = 0
   for (const f of Array.from(files)) {
     if (!f.type.startsWith('image')) continue
-    items.push({ id: uid(), entryId, projectId, blob: f, addedAt: now() + i++ })
+    // Guardar un Blob "plano" (no el File): Safari/iOS a veces no clona bien un
+    // File en IndexedDB y la subida falla. `slice` devuelve un Blob equivalente.
+    const blob = f.slice(0, f.size, f.type)
+    items.push({ id: uid(), entryId, projectId, blob, addedAt: now() + i++ })
   }
   if (items.length) await db.images.bulkAdd(items)
+  return items.length
 }
 
 export async function deleteImage(id: string): Promise<void> {
