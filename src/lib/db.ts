@@ -13,12 +13,21 @@ export type WikiType =
 
 export type ChapterStatus = 'idea' | 'draft' | 'revision' | 'done'
 
+/** Tipo de relación del grafo (id, etiqueta, color). */
+export interface RelType {
+  id: string
+  label: string
+  color: string
+}
+
 export interface Project {
   id: string
   title: string
   description: string
   genre: string
   coverColor: string
+  /** Tipos de relación personalizados por el usuario (además de los de fábrica) */
+  relTypes?: RelType[]
   /** Id de la imagen de portada (en la tabla `images`, con entryId = id del
    *  proyecto). Si no hay, se usa el color `coverColor`. */
   coverImageId?: string

@@ -33,16 +33,25 @@ import {
   Search,
   Wand2,
   TreePine,
+  X,
 } from 'lucide-react'
-import { db, type WikiEntry, type Link, type WikiType } from '@/lib/db'
+import {
+  db,
+  type WikiEntry,
+  type Link,
+  type WikiType,
+  type RelType,
+} from '@/lib/db'
 import {
   createLink,
   updateLink,
   deleteLink,
   deleteWiki,
   saveNodePos,
+  addRelType,
+  deleteRelType,
 } from '@/lib/repo'
-import { REL_TYPES, relMeta } from '@/lib/constants'
+import { REL_TYPES } from '@/lib/constants'
 import { toast } from '@/lib/toast'
 import { WIKI_TYPES, wikiMeta } from '@/components/wikiMeta'
 import { WikiAvatar } from '@/components/wiki/WikiAvatar'
@@ -51,9 +60,10 @@ import { FamilyTree } from '@/components/wiki/FamilyTree'
 import { Button } from '@/components/ui/Button'
 import { Modal } from '@/components/ui/Modal'
 import { Input, Label, Select } from '@/components/ui/Field'
+import { ColorPicker } from '@/components/ui/ColorPicker'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { useResolvedDark } from '@/lib/theme'
-import { cn } from '@/lib/utils'
+import { PALETTE, cn } from '@/lib/utils'
 
 function EntityNode({ data }: NodeProps) {
   const entry = data.entry as WikiEntry
@@ -100,11 +110,9 @@ function EntityNode({ data }: NodeProps) {
 
 const nodeTypes = { entity: EntityNode }
 
-/** Vínculos de parentesco (van al árbol genealógico). El resto son "sociales". */
+/** Vínculos de parentesco (van al árbol genealógico). El resto son "sociales"
+ *  (incluidos los tipos personalizados del usuario). */
 const FAMILY_REL_IDS = new Set(['family', 'spouse', 'sibling'])
-const SOCIAL_REL_IDS = REL_TYPES.map((r) => r.id).filter(
-  (id) => !FAMILY_REL_IDS.has(id),
-)
 
 function circlePos(i: number, n: number) {
   const R = 110 + n * 22
@@ -145,6 +153,7 @@ function dagreLayout(
 function LinkModal({
   projectId,
   entries,
+  relTypes,
   editLink,
   addOpen,
   onClose,
@@ -152,6 +161,7 @@ function LinkModal({
 }: {
   projectId: string
   entries: WikiEntry[]
+  relTypes: RelType[]
   editLink: Link | null
   addOpen: boolean
   onClose: () => void
@@ -163,6 +173,9 @@ function LinkModal({
   const [label, setLabel] = useState('')
   const [relType, setRelType] = useState('other')
   const [strength, setStrength] = useState(0)
+  const [newTypeOpen, setNewTypeOpen] = useState(false)
+  const [newTypeName, setNewTypeName] = useState('')
+  const [newTypeColor, setNewTypeColor] = useState(PALETTE[4])
 
   useEffect(() => {
     if (editLink) {
@@ -251,7 +264,7 @@ function LinkModal({
         <div>
           <Label>Tipo</Label>
           <div className="flex flex-wrap gap-1.5">
-            {REL_TYPES.map((r) => (
+            {relTypes.map((r) => (
               <button
                 key={r.id}
                 onClick={() => setRelType(r.id)}
@@ -272,7 +285,45 @@ function LinkModal({
                 {r.label}
               </button>
             ))}
+            <button
+              onClick={() => setNewTypeOpen((o) => !o)}
+              className="flex items-center gap-1 rounded-full border border-dashed border-border px-3 py-1.5 text-sm text-muted-foreground transition hover:bg-muted"
+            >
+              <Plus size={13} /> Nuevo tipo
+            </button>
           </div>
+          {newTypeOpen && (
+            <div className="mt-2 flex flex-wrap items-center gap-2 rounded-lg border border-border p-2">
+              <Input
+                value={newTypeName}
+                onChange={(e) => setNewTypeName(e.target.value)}
+                placeholder="Nombre del tipo (ej: Rival)…"
+                className="h-8 min-w-0 flex-1"
+              />
+              <ColorPicker
+                value={newTypeColor}
+                onChange={setNewTypeColor}
+                colors={PALETTE.slice(0, 8)}
+                swatchClass="h-6 w-6"
+              />
+              <Button
+                size="sm"
+                disabled={!newTypeName.trim()}
+                onClick={async () => {
+                  const id = await addRelType(
+                    projectId,
+                    newTypeName,
+                    newTypeColor,
+                  )
+                  setRelType(id)
+                  setNewTypeName('')
+                  setNewTypeOpen(false)
+                }}
+              >
+                Crear
+              </Button>
+            </div>
+          )}
           {relType === 'family' && (
             <p className="mt-2 rounded-lg bg-muted/60 px-2.5 py-1.5 text-xs text-muted-foreground">
               «Familia» es dirigida para el árbol genealógico:{' '}
@@ -386,6 +437,17 @@ function GraphInner() {
       projectId ? db.layout.where('projectId').equals(projectId).toArray() : [],
     [projectId],
   )
+  const project = useLiveQuery(
+    () => (projectId ? db.projects.get(projectId) : undefined),
+    [projectId],
+  )
+  // Tipos de relación: los de fábrica + los personalizados del proyecto.
+  const allRelTypes = [...REL_TYPES, ...(project?.relTypes ?? [])]
+  const resolveRel = (id: string) =>
+    allRelTypes.find((r) => r.id === id) ?? REL_TYPES[REL_TYPES.length - 1]
+  const socialRelIds = allRelTypes
+    .map((r) => r.id)
+    .filter((id) => !FAMILY_REL_IDS.has(id))
 
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
@@ -405,6 +467,9 @@ function GraphInner() {
 
   const catsKey = [...hiddenCats].join(',')
   const relsKey = [...hiddenRels].join(',')
+  const relTypesSig = (project?.relTypes ?? [])
+    .map((r) => r.id + r.color)
+    .join(',')
 
   // Persistir los filtros para que sobrevivan al cambiar de menú.
   useEffect(() => {
@@ -433,7 +498,7 @@ function GraphInner() {
   function setRelView(v: 'all' | 'social' | 'family') {
     if (v === 'all') setHiddenRels(new Set())
     else if (v === 'social') setHiddenRels(new Set(FAMILY_REL_IDS))
-    else setHiddenRels(new Set(SOCIAL_REL_IDS))
+    else setHiddenRels(new Set(socialRelIds))
   }
   const relView: 'all' | 'social' | 'family' | 'custom' =
     hiddenRels.size === 0
@@ -441,8 +506,8 @@ function GraphInner() {
       : hiddenRels.size === FAMILY_REL_IDS.size &&
           [...hiddenRels].every((r) => FAMILY_REL_IDS.has(r))
         ? 'social'
-        : hiddenRels.size === SOCIAL_REL_IDS.length &&
-            [...hiddenRels].every((r) => SOCIAL_REL_IDS.includes(r))
+        : hiddenRels.size === socialRelIds.length &&
+            [...hiddenRels].every((r) => socialRelIds.includes(r))
           ? 'family'
           : 'custom'
 
@@ -505,7 +570,7 @@ function GraphInner() {
           return true
         })
         .map((l) => {
-          const c = relMeta(l.relType).color
+          const c = resolveRel(l.relType).color
           const dim = focusId
             ? l.fromId !== focusId && l.toId !== focusId
             : false
@@ -532,7 +597,7 @@ function GraphInner() {
         }),
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [linksSig, isDark, focusId, relsKey, catsKey, entriesSig])
+  }, [linksSig, isDark, focusId, relsKey, catsKey, entriesSig, relTypesSig])
 
   // Nodo donde EMPIEZA el arrastre, para fijar la dirección de la flecha
   const connectStart = useRef<string | null>(null)
@@ -758,28 +823,41 @@ function GraphInner() {
             Relaciones
           </p>
           <div className="flex flex-wrap gap-1.5">
-            {REL_TYPES.map((r) => {
+            {allRelTypes.map((r) => {
               const off = hiddenRels.has(r.id)
+              const custom = r.id.startsWith('rel-')
               return (
-                <button
-                  key={r.id}
-                  onClick={() => toggleRel(r.id)}
-                  className={cn(
-                    'flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs transition',
-                    off
-                      ? 'border-border text-muted-foreground opacity-50'
-                      : 'border-transparent text-white',
+                <div key={r.id} className="flex items-center">
+                  <button
+                    onClick={() => toggleRel(r.id)}
+                    className={cn(
+                      'flex items-center gap-1.5 border px-2.5 py-1 text-xs transition',
+                      custom ? 'rounded-l-full' : 'rounded-full',
+                      off
+                        ? 'border-border text-muted-foreground opacity-50'
+                        : 'border-transparent text-white',
+                    )}
+                    style={off ? undefined : { backgroundColor: r.color }}
+                  >
+                    <span
+                      className="h-2 w-2 rounded-full"
+                      style={{
+                        backgroundColor: off ? r.color : 'rgba(255,255,255,.85)',
+                      }}
+                    />
+                    {r.label}
+                  </button>
+                  {custom && (
+                    <button
+                      onClick={() => void deleteRelType(projectId!, r.id)}
+                      title="Eliminar este tipo"
+                      aria-label={`Eliminar tipo ${r.label}`}
+                      className="rounded-r-full border border-l-0 border-border px-1.5 py-1 text-muted-foreground transition hover:text-danger"
+                    >
+                      <X size={11} />
+                    </button>
                   )}
-                  style={off ? undefined : { backgroundColor: r.color }}
-                >
-                  <span
-                    className="h-2 w-2 rounded-full"
-                    style={{
-                      backgroundColor: off ? r.color : 'rgba(255,255,255,.85)',
-                    }}
-                  />
-                  {r.label}
-                </button>
+                </div>
               )
             })}
           </div>
@@ -815,6 +893,7 @@ function GraphInner() {
       <LinkModal
         projectId={projectId!}
         entries={entries ?? []}
+        relTypes={allRelTypes}
         editLink={editLink}
         addOpen={addOpen}
         onSaved={() => {

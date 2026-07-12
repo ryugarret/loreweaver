@@ -1,4 +1,4 @@
-import type { ChapterStatus } from './db'
+import type { ChapterStatus, RelType } from './db'
 
 export const CHAPTER_STATUS: {
   id: ChapterStatus
@@ -15,8 +15,9 @@ export function statusMeta(s: ChapterStatus) {
   return CHAPTER_STATUS.find((x) => x.id === s) ?? CHAPTER_STATUS[1]
 }
 
-/** Tipos de relación para el grafo de vínculos. */
-export const REL_TYPES: { id: string; label: string; color: string }[] = [
+/** Tipos de relación de fábrica para el grafo de vínculos. El usuario puede
+ *  añadir los suyos por proyecto (Project.relTypes). */
+export const REL_TYPES: RelType[] = [
   { id: 'family', label: 'Familia', color: '#10b981' },
   { id: 'spouse', label: 'Cónyuge', color: '#fb7185' },
   { id: 'sibling', label: 'Hermano', color: '#14b8a6' },

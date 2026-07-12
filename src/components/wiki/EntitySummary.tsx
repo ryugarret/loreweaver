@@ -5,7 +5,7 @@ import { Modal } from '@/components/ui/Modal'
 import { Button } from '@/components/ui/Button'
 import { BlobImage } from '@/components/BlobImage'
 import { wikiMeta } from '@/components/wikiMeta'
-import { relMeta } from '@/lib/constants'
+import { REL_TYPES } from '@/lib/constants'
 
 /** Tarjeta de resumen (solo lectura) de una ficha, con botón para abrir la completa. */
 export function EntitySummary({
@@ -24,6 +24,15 @@ export function EntitySummary({
     }
     return db.images.where('entryId').equals(entry.id).first()
   }, [entry.id, entry.coverImageId])
+
+  // Tipos de relación (fábrica + personalizados del proyecto) para colorear bien.
+  const relTypes =
+    useLiveQuery(async () => {
+      const p = await db.projects.get(entry.projectId)
+      return [...REL_TYPES, ...(p?.relTypes ?? [])]
+    }, [entry.projectId]) ?? REL_TYPES
+  const resolveRel = (id: string) =>
+    relTypes.find((r) => r.id === id) ?? REL_TYPES[REL_TYPES.length - 1]
 
   // Relaciones de esta entidad (para mostrar un vistazo de "con quién se conecta").
   const rels = useLiveQuery(async () => {
@@ -120,7 +129,7 @@ export function EntitySummary({
             </p>
             <ul className="space-y-1">
               {shownRels.map((r) => {
-                const rm = relMeta(r.relType)
+                const rm = resolveRel(r.relType)
                 return (
                   <li key={r.id} className="flex items-center gap-2 text-sm">
                     <span

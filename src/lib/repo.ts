@@ -10,6 +10,7 @@ import {
   type EntityKind,
   type TimelineEvent,
   type Lane,
+  type RelType,
 } from './db'
 import { uid, now } from './utils'
 
@@ -40,6 +41,35 @@ export async function updateProject(
   patch: Partial<Project>,
 ): Promise<void> {
   await db.projects.update(id, { ...patch, updatedAt: now() })
+}
+
+/** Añade un tipo de relación personalizado al proyecto. Devuelve su id. */
+export async function addRelType(
+  projectId: string,
+  label: string,
+  color: string,
+): Promise<string> {
+  const p = await db.projects.get(projectId)
+  const id = 'rel-' + uid()
+  const t: RelType = { id, label: label.trim() || 'Nuevo tipo', color }
+  await db.projects.update(projectId, {
+    relTypes: [...(p?.relTypes ?? []), t],
+    updatedAt: now(),
+  })
+  return id
+}
+
+/** Elimina un tipo de relación personalizado (los vínculos que lo usen quedan
+ *  con ese id y se muestran con el estilo por defecto). */
+export async function deleteRelType(
+  projectId: string,
+  id: string,
+): Promise<void> {
+  const p = await db.projects.get(projectId)
+  await db.projects.update(projectId, {
+    relTypes: (p?.relTypes ?? []).filter((t) => t.id !== id),
+    updatedAt: now(),
+  })
 }
 
 /** Pone (o reemplaza) la foto de portada del proyecto. La imagen se guarda en la
