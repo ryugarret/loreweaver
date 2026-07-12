@@ -110,7 +110,7 @@ function flash(editor: Editor, ranges: [number, number][]) {
  * Lleva la vista al "eco" de `word`: resalta solo el par de apariciones más
  * próximo (una palabra frecuente sale muchas veces; el eco es la pareja cercana).
  */
-export function locateWord(editor: Editor, word: string) {
+export function locateEcho(editor: Editor, word: string) {
   const ranges = findRanges(editor, word)
   if (ranges.length === 0) return
 
@@ -130,7 +130,7 @@ export function locateWord(editor: Editor, word: string) {
   flash(editor, pick)
 }
 
-/** Lleva la vista a una frase repetida y resalta TODAS sus apariciones. */
-export function locatePhrase(editor: Editor, phrase: string) {
-  flash(editor, findRanges(editor, phrase))
+/** Resalta TODAS las apariciones de `query` (una palabra o una frase) y salta a la primera. */
+export function locateAll(editor: Editor, query: string) {
+  flash(editor, findRanges(editor, query))
 }

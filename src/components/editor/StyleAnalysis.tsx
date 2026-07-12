@@ -11,8 +11,9 @@ export function StyleAnalysis({
 }: {
   content: string
   onClose: () => void
-  /** Salta a esa palabra/frase en el editor y la resalta un momento. */
-  onLocate: (query: string, kind: 'word' | 'phrase') => void
+  /** Salta a esa palabra/frase en el editor y la resalta un momento.
+   *  'echo' = solo el par más cercano · 'all' = todas las apariciones. */
+  onLocate: (query: string, kind: 'echo' | 'all') => void
 }) {
   const r = useMemo(() => analyzeText(content), [content])
 
@@ -76,15 +77,18 @@ export function StyleAnalysis({
 
           <Section
             title="Palabras que más repites"
-            hint="Nombres de personajes aparte (esos van con @). ¿Puedes variar alguna?"
+            hint="Toca una para verla resaltada en el texto. Los nombres van con @ aparte."
             empty={r.repeatedWords.length === 0}
           >
             <div className="flex flex-wrap gap-1.5">
               {r.repeatedWords.map((w) => (
-                <span
+                <button
                   key={w.word}
+                  type="button"
+                  onClick={() => onLocate(w.word, 'all')}
+                  title={`Ir a «${w.word}» en el texto`}
                   className={cn(
-                    'rounded-full border px-2.5 py-1 text-xs',
+                    'rounded-full border px-2.5 py-1 text-xs transition hover:ring-1 hover:ring-inset hover:ring-current',
                     w.count >= 8
                       ? 'border-danger/40 bg-danger/10 text-danger'
                       : w.count >= 5
@@ -93,7 +97,7 @@ export function StyleAnalysis({
                   )}
                 >
                   {w.word} <span className="font-semibold tabular-nums">×{w.count}</span>
-                </span>
+                </button>
               ))}
             </div>
           </Section>
@@ -108,7 +112,7 @@ export function StyleAnalysis({
                 <li key={p.phrase}>
                   <button
                     type="button"
-                    onClick={() => onLocate(p.phrase, 'phrase')}
+                    onClick={() => onLocate(p.phrase, 'all')}
                     title={`Ir a «${p.phrase}» en el texto`}
                     className="group flex w-full items-center justify-between gap-3 rounded-lg bg-muted/50 px-3 py-1.5 text-left text-sm transition hover:bg-muted"
                   >
@@ -138,7 +142,7 @@ export function StyleAnalysis({
                 <li key={c.word}>
                   <button
                     type="button"
-                    onClick={() => onLocate(c.word, 'word')}
+                    onClick={() => onLocate(c.word, 'echo')}
                     title={`Ir a «${c.word}» en el texto`}
                     className="group flex w-full items-center justify-between gap-3 rounded-lg bg-muted/50 px-3 py-1.5 text-left text-sm transition hover:bg-muted"
                   >
