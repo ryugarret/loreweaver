@@ -284,6 +284,7 @@ export async function createWiki(
     color,
     fields: [],
     tags: [],
+    order: ts, // se añade al final (ts es monotónico); reordenable a mano
     createdAt: ts,
     updatedAt: ts,
   })
@@ -294,6 +295,15 @@ export async function createWiki(
 export async function saveWiki(entry: WikiEntry): Promise<void> {
   await db.wiki.put({ ...entry, updatedAt: now() })
   await touchProject(entry.projectId)
+}
+
+/** Fija el orden manual de las fichas (arrastrar para reordenar): order = índice. */
+export async function reorderWiki(ids: string[]): Promise<void> {
+  await db.transaction('rw', db.wiki, async () => {
+    for (let i = 0; i < ids.length; i++) {
+      await db.wiki.update(ids[i], { order: i })
+    }
+  })
 }
 
 /** Ids de fichas @mencionadas dentro de un HTML (nodos `.mention[data-id]`). */

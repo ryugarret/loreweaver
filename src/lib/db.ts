@@ -73,6 +73,8 @@ export interface WikiEntry {
   color: string
   fields: WikiField[]
   tags: string[]
+  /** Orden manual en la lista de la wiki (arrastrar para reordenar) */
+  order?: number
   /** Id de la imagen usada como portada/avatar (si hay) */
   coverImageId?: string
   /** Género (opcional) — solo se usa para colorear el árbol genealógico */
