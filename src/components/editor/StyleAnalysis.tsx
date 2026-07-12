@@ -11,8 +11,8 @@ export function StyleAnalysis({
 }: {
   content: string
   onClose: () => void
-  /** Salta a esa palabra en el editor y la resalta un momento. */
-  onLocate: (word: string) => void
+  /** Salta a esa palabra/frase en el editor y la resalta un momento. */
+  onLocate: (query: string, kind: 'word' | 'phrase') => void
 }) {
   const r = useMemo(() => analyzeText(content), [content])
 
@@ -100,21 +100,29 @@ export function StyleAnalysis({
 
           <Section
             title="Frases que se repiten"
-            hint="Secuencias de 3–4 palabras que aparecen más de una vez."
+            hint="Toca una para saltar a ella y ver resaltadas todas sus apariciones."
             empty={r.repeatedPhrases.length === 0}
           >
             <ul className="space-y-1.5">
               {r.repeatedPhrases.map((p) => (
-                <li
-                  key={p.phrase}
-                  className="flex items-center justify-between gap-3 rounded-lg bg-muted/50 px-3 py-1.5 text-sm"
-                >
-                  <span className="min-w-0 flex-1 truncate italic">
-                    «{p.phrase}»
-                  </span>
-                  <span className="shrink-0 text-xs font-semibold tabular-nums text-muted-foreground">
-                    ×{p.count}
-                  </span>
+                <li key={p.phrase}>
+                  <button
+                    type="button"
+                    onClick={() => onLocate(p.phrase, 'phrase')}
+                    title={`Ir a «${p.phrase}» en el texto`}
+                    className="group flex w-full items-center justify-between gap-3 rounded-lg bg-muted/50 px-3 py-1.5 text-left text-sm transition hover:bg-muted"
+                  >
+                    <span className="min-w-0 flex-1 truncate italic">
+                      «{p.phrase}»
+                    </span>
+                    <span className="flex shrink-0 items-center gap-1.5 text-xs font-semibold tabular-nums text-muted-foreground">
+                      ×{p.count}
+                      <Crosshair
+                        size={13}
+                        className="text-muted-foreground/60 transition group-hover:text-accent"
+                      />
+                    </span>
+                  </button>
                 </li>
               ))}
             </ul>
@@ -130,7 +138,7 @@ export function StyleAnalysis({
                 <li key={c.word}>
                   <button
                     type="button"
-                    onClick={() => onLocate(c.word)}
+                    onClick={() => onLocate(c.word, 'word')}
                     title={`Ir a «${c.word}» en el texto`}
                     className="group flex w-full items-center justify-between gap-3 rounded-lg bg-muted/50 px-3 py-1.5 text-left text-sm transition hover:bg-muted"
                   >

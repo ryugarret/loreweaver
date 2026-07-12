@@ -35,7 +35,7 @@ import {
 } from '@/lib/repo'
 import { ChapterHistory } from './ChapterHistory'
 import { StyleAnalysis } from './StyleAnalysis'
-import { LocateHighlight, locateWord } from './locateHighlight'
+import { LocateHighlight, locateWord, locatePhrase } from './locateHighlight'
 import { ManuscriptFormat } from './manuscriptFormat'
 import { setActiveEditorFlush } from '@/lib/editorFlush'
 import { cn, countWords, now } from '@/lib/utils'
@@ -473,10 +473,11 @@ export function ChapterEditor({ chapter }: { chapter: Chapter }) {
         <StyleAnalysis
           content={editor.getHTML()}
           onClose={() => setStyleOpen(false)}
-          onLocate={(word) => {
-            // Cerramos el panel (tapa el texto) y saltamos al eco en el editor.
+          onLocate={(query, kind) => {
+            // Cerramos el panel (tapa el texto) y saltamos a la palabra/frase.
             setStyleOpen(false)
-            locateWord(editor, word)
+            if (kind === 'phrase') locatePhrase(editor, query)
+            else locateWord(editor, query)
           }}
         />
       )}
