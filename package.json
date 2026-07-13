@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@dagrejs/dagre": "^3.0.0",
+    "@supabase/supabase-js": "^2.110.2",
     "@tailwindcss/vite": "^4.3.1",
     "@tiptap/extension-character-count": "^3.27.1",
     "@tiptap/extension-mention": "^3.27.1",
