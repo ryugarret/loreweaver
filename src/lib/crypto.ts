@@ -240,3 +240,33 @@ export async function encryptJSON(value: unknown, dek: CryptoKey): Promise<Ciphe
 export async function decryptJSON<T>(cipher: Cipher, dek: CryptoKey): Promise<T> {
   return JSON.parse(await decryptString(cipher, dek)) as T
 }
+
+/* ---------- blobs binarios (imágenes) para Storage ---------- */
+
+/** Cifra un Blob → Blob binario (iv[12] ++ ciphertext). Sin base64 = mínimo tamaño. */
+export async function encryptBlob(blob: Blob, dek: CryptoKey): Promise<Blob> {
+  const iv = randomBytes(IV_BYTES)
+  const data = new Uint8Array(await blob.arrayBuffer())
+  const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, dek, data)
+  return new Blob([iv, ct])
+}
+
+/** Descifra un Blob producido por encryptBlob. */
+export async function decryptBlob(blob: Blob, dek: CryptoKey): Promise<Blob> {
+  const buf = new Uint8Array(await blob.arrayBuffer())
+  const pt = await crypto.subtle.decrypt(
+    { name: 'AES-GCM', iv: buf.slice(0, IV_BYTES) },
+    dek,
+    buf.slice(IV_BYTES),
+  )
+  return new Blob([pt])
+}
+
+/** SHA-256 en hex de un Blob (clave de dedupe y ruta en Storage). */
+export async function sha256Hex(blob: Blob): Promise<string> {
+  const digest = await crypto.subtle.digest('SHA-256', await blob.arrayBuffer())
+  const bytes = new Uint8Array(digest)
+  let hex = ''
+  for (let i = 0; i < bytes.length; i++) hex += bytes[i].toString(16).padStart(2, '0')
+  return hex
+}

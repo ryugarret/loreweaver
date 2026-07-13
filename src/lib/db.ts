@@ -99,6 +99,8 @@ export interface ImageAsset {
   projectId: string
   blob: Blob
   addedAt: number
+  /** SHA-256 (hex) del blob: dedupe y ruta en Storage. Se calcula al sincronizar. */
+  hash?: string
 }
 
 /** Qué tipo de entidad enlaza un vínculo. */
