@@ -13,6 +13,7 @@ import {
   type RelType,
 } from './db'
 import { uid, now } from './utils'
+import { compressImage } from './image'
 
 /* ====== Proyectos ====== */
 
@@ -85,7 +86,7 @@ export async function setProjectCover(
     id,
     entryId: projectId,
     projectId,
-    blob: file,
+    blob: await compressImage(file),
     addedAt: now(),
   })
   await db.projects.update(projectId, { coverImageId: id, updatedAt: now() })
@@ -395,9 +396,9 @@ export async function addImages(
   let i = 0
   for (const f of Array.from(files)) {
     if (!f.type.startsWith('image')) continue
-    // Guardar un Blob "plano" (no el File): Safari/iOS a veces no clona bien un
-    // File en IndexedDB y la subida falla. `slice` devuelve un Blob equivalente.
-    const blob = f.slice(0, f.size, f.type)
+    // Comprimir (redimensionar + WebP) para que ocupe lo mínimo; devuelve un Blob
+    // "plano" (Safari/iOS a veces no clona bien un File en IndexedDB).
+    const blob = await compressImage(f)
     items.push({ id: uid(), entryId, projectId, blob, addedAt: now() + i++ })
   }
   if (items.length) await db.images.bulkAdd(items)
