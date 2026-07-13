@@ -1,6 +1,4 @@
 import {
-  lazy,
-  Suspense,
   useRef,
   useState,
   useSyncExternalStore,
@@ -18,6 +16,7 @@ import {
   HardDrive,
   Link2,
   RefreshCw,
+  Cloud,
 } from 'lucide-react'
 import { Modal } from '@/components/ui/Modal'
 import { Button } from '@/components/ui/Button'
@@ -26,13 +25,6 @@ import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { useUi, ACCENTS, accentColor, type ThemeMode } from '@/store/ui'
 import { ColorPicker } from '@/components/ui/ColorPicker'
 import { importAll, wipeAll } from '@/lib/repo'
-
-// Carga diferida: arrastra Supabase (~100 KB); solo se baja al abrir Ajustes.
-const AccountSection = lazy(() =>
-  import('@/components/settings/AccountSection').then((m) => ({
-    default: m.AccountSection,
-  })),
-)
 import { saveBackup, openBackup, linkedFileName } from '@/lib/fileBackup'
 import {
   subscribeDisk,
@@ -69,6 +61,7 @@ export function SettingsModal() {
   const {
     settingsOpen,
     setSettingsOpen,
+    setAccountOpen,
     theme,
     setTheme,
     accentId,
@@ -232,13 +225,20 @@ export function SettingsModal() {
           </Section>
 
           <Section title="Cuenta y sincronización (opcional)">
-            <Suspense
-              fallback={
-                <p className="text-xs text-muted-foreground">Cargando…</p>
-              }
+            <p className="mb-3 text-xs leading-relaxed text-muted-foreground">
+              Sincroniza tus historias entre dispositivos con cifrado de extremo a
+              extremo. También desde el botón «Sincronizar» de la pantalla de inicio.
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setSettingsOpen(false)
+                setAccountOpen(true)
+              }}
             >
-              <AccountSection />
-            </Suspense>
+              <Cloud size={15} /> Abrir cuenta y sincronización
+            </Button>
           </Section>
 
           <Section title="Tus datos (copia de seguridad)">

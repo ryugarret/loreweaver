@@ -24,6 +24,8 @@ function friendly(msg: string): string {
     return 'Ya hay una cuenta con ese email. Inicia sesión.'
   if (/Password should be at least/i.test(msg))
     return 'La contraseña es demasiado corta (mínimo 6).'
+  if (/character of each|weak password/i.test(msg))
+    return 'La contraseña necesita mayúscula, minúscula, número y símbolo.'
   if (/email/i.test(msg) && /invalid/i.test(msg)) return 'Ese email no es válido.'
   if (/cofre|descifr|decrypt|operation-specific/i.test(msg))
     return 'Contraseña incorrecta para el cifrado.'
@@ -217,6 +219,12 @@ export function AccountSection() {
             }}
           />
         </div>
+        {mode === 'signup' && (
+          <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
+            Tu contraseña cifra tus historias: usa mayúscula, minúscula, número y
+            símbolo. Guárdala bien — con ella se abre el cifrado.
+          </p>
+        )}
         {error && <p className="mt-2 text-xs font-medium text-danger">{error}</p>}
         <Button
           className="mt-3 w-full"

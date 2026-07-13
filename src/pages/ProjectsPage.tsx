@@ -10,6 +10,7 @@ import {
   Moon,
   Sun,
   Feather,
+  Cloud,
 } from 'lucide-react'
 import { db, type Project } from '@/lib/db'
 import { deleteProject } from '@/lib/repo'
@@ -101,7 +102,7 @@ export function ProjectsPage() {
     () => db.projects.orderBy('updatedAt').reverse().toArray(),
     [],
   )
-  const { setTheme, setSettingsOpen } = useUi()
+  const { setTheme, setSettingsOpen, setAccountOpen } = useUi()
   const isDark = useResolvedDark()
 
   const [creating, setCreating] = useState(false)
@@ -124,6 +125,14 @@ export function ProjectsPage() {
             </div>
           </div>
           <div className="flex items-center gap-1.5">
+            <Button
+              variant="outline"
+              size="sm"
+              title="Cuenta y sincronización entre dispositivos (cifrado)"
+              onClick={() => setAccountOpen(true)}
+            >
+              <Cloud size={16} /> Sincronizar
+            </Button>
             <Button
               variant="ghost"
               size="icon"

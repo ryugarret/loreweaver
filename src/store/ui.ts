@@ -30,6 +30,7 @@ interface UiState {
   accentId: string
   sidebarCollapsed: boolean
   settingsOpen: boolean
+  accountOpen: boolean
   /** Tipografia del editor: serif (manuscrito) o sans */
   editorFont: 'serif' | 'sans'
   pomodoroWork: number
@@ -47,6 +48,7 @@ interface UiState {
   toggleSidebar: () => void
   setSidebar: (v: boolean) => void
   setSettingsOpen: (v: boolean) => void
+  setAccountOpen: (v: boolean) => void
   setEditorFont: (f: 'serif' | 'sans') => void
   setPomodoro: (work: number, brk: number) => void
   setDailyGoal: (v: number) => void
@@ -63,6 +65,7 @@ export const useUi = create<UiState>()(
       accentId: 'violet',
       sidebarCollapsed: false,
       settingsOpen: false,
+      accountOpen: false,
       editorFont: 'serif',
       pomodoroWork: 25,
       pomodoroBreak: 5,
@@ -76,6 +79,7 @@ export const useUi = create<UiState>()(
       toggleSidebar: () => set((s) => ({ sidebarCollapsed: !s.sidebarCollapsed })),
       setSidebar: (sidebarCollapsed) => set({ sidebarCollapsed }),
       setSettingsOpen: (settingsOpen) => set({ settingsOpen }),
+      setAccountOpen: (accountOpen) => set({ accountOpen }),
       setEditorFont: (editorFont) => set({ editorFont }),
       setPomodoro: (pomodoroWork, pomodoroBreak) =>
         set({ pomodoroWork, pomodoroBreak }),
@@ -108,6 +112,7 @@ export const useUi = create<UiState>()(
         ...current,
         ...(persisted as Partial<UiState>),
         settingsOpen: false,
+        accountOpen: false,
       }),
     },
   ),

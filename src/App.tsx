@@ -31,6 +31,7 @@ const GuidePage = lazy(() =>
   import('@/pages/GuidePage').then((m) => ({ default: m.GuidePage })),
 )
 import { SettingsModal } from '@/components/SettingsModal'
+import { AccountModal } from '@/components/AccountModal'
 import { FocusDock } from '@/components/FocusDock'
 import { MentionViewer } from '@/components/MentionViewer'
 import { Toaster } from '@/components/Toaster'
@@ -125,6 +126,7 @@ export default function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <SettingsModal />
+      <AccountModal />
       <FocusDock />
       <MentionViewer />
       <Toaster />
