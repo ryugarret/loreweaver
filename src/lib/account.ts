@@ -21,6 +21,9 @@ import {
 } from './crypto'
 
 const DEK_KV_KEY = 'sync.dek'
+/** Bandera ligera en localStorage: hay cuenta en este dispositivo. La lee el
+ *  arranque para cargar el módulo de sync SOLO si hace falta (bundle liviano). */
+const ACCOUNT_FLAG = 'lw-account'
 
 /** Clave de datos de la sesión (en memoria). null = cofre cerrado. */
 let dek: CryptoKey | null = null
@@ -36,8 +39,13 @@ export function currentDEK(): CryptoKey | null {
 
 async function setDEK(key: CryptoKey | null): Promise<void> {
   dek = key
-  if (key) await db.kv.put({ key: DEK_KV_KEY, value: key })
-  else await db.kv.delete(DEK_KV_KEY)
+  if (key) {
+    await db.kv.put({ key: DEK_KV_KEY, value: key })
+    localStorage.setItem(ACCOUNT_FLAG, '1')
+  } else {
+    await db.kv.delete(DEK_KV_KEY)
+    localStorage.removeItem(ACCOUNT_FLAG)
+  }
 }
 
 /** Al arrancar la app: recupera la DEK guardada en este dispositivo (si la hay). */
@@ -118,10 +126,24 @@ export async function signIn(
   return { recoveryKey: await ensureKeyring(data.user.id, password) }
 }
 
-/** Cierra sesión y el cofre (borra la DEK local). */
+/**
+ * Reabre el cofre con la contraseña cuando ya hay sesión pero no hay DEK en este
+ * dispositivo (p. ej. otro navegador, o tras limpiar datos locales).
+ */
+export async function unlock(password: string): Promise<void> {
+  const { data } = await supabase.auth.getUser()
+  const userId = data.user?.id
+  if (!userId) throw new Error('No hay sesión iniciada.')
+  const keyring = await loadKeyring(userId)
+  if (!keyring) throw new Error('Esta cuenta no tiene un cofre de cifrado.')
+  await setDEK(await unlockWithPassphrase(keyring, password))
+}
+
+/** Cierra sesión y el cofre (borra la DEK y el estado de sync de este dispositivo). */
 export async function signOut(): Promise<void> {
   await supabase.auth.signOut()
   await setDEK(null)
+  await db.kv.delete('sync.state') // bookkeeping por-dispositivo; se rehace al entrar
 }
 
 /**

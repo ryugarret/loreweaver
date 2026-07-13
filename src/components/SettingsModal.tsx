@@ -1,4 +1,6 @@
 import {
+  lazy,
+  Suspense,
   useRef,
   useState,
   useSyncExternalStore,
@@ -24,6 +26,13 @@ import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { useUi, ACCENTS, accentColor, type ThemeMode } from '@/store/ui'
 import { ColorPicker } from '@/components/ui/ColorPicker'
 import { importAll, wipeAll } from '@/lib/repo'
+
+// Carga diferida: arrastra Supabase (~100 KB); solo se baja al abrir Ajustes.
+const AccountSection = lazy(() =>
+  import('@/components/settings/AccountSection').then((m) => ({
+    default: m.AccountSection,
+  })),
+)
 import { saveBackup, openBackup, linkedFileName } from '@/lib/fileBackup'
 import {
   subscribeDisk,
@@ -220,6 +229,16 @@ export function SettingsModal() {
                 />
               </div>
             </div>
+          </Section>
+
+          <Section title="Cuenta y sincronización (opcional)">
+            <Suspense
+              fallback={
+                <p className="text-xs text-muted-foreground">Cargando…</p>
+              }
+            >
+              <AccountSection />
+            </Suspense>
           </Section>
 
           <Section title="Tus datos (copia de seguridad)">

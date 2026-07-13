@@ -58,6 +58,11 @@ export default function App() {
   useEffect(() => {
     void requestPersistentStorage()
     void initDiskSync()
+    // Sync (opt-in): solo cargamos el módulo pesado (Supabase) si ya hay cuenta
+    // en este dispositivo, para no engordar el bundle de quien va 100% local.
+    if (localStorage.getItem('lw-account') === '1') {
+      void import('@/lib/sync').then((m) => m.initSync())
+    }
   }, [])
 
   // Sincronizar el motor de sonido de teclado con los ajustes
